@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const fs = require\\('fs'\\); const content = fs.readFileSync\\('src/App.jsx','utf8'\\); const issues = []; if \\(!content.includes\\('AdminDashboard'\\)\\) issues.push\\('AdminDashboard missing'\\); if \\(!content.includes\\('Impact'\\)\\) issues.push\\('Impact missing'\\); if \\(!content.includes\\('SystemFlow'\\)\\) issues.push\\('SystemFlow missing'\\); if \\(!content.includes\\('FinalCTA'\\)\\) issues.push\\('FinalCTA missing'\\); if \\(!content.includes\\('db-shell'\\)\\) issues.push\\('db-shell missing'\\); if \\(issues.length\\) console.log\\('ISSUES:', issues\\); else console.log\\('All sections present'\\);\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const css = fs.readFileSync\\('src/index.css','utf8'\\); const checks = ['.db-shell','.db-kpis','.db-bars','.db-log','.impact-kpis','.impact-grid','.impact-tag','.flow-diagram','.flow-node','.final-cta-section','.hero-stats-note']; const missing = checks.filter\\(c => !css.includes\\(c\\)\\); if\\(missing.length\\) console.log\\('Missing CSS:', missing\\); else console.log\\('All CSS classes present. Lines:', css.split\\('\\\\n'\\).length\\);\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const css = fs.readFileSync\\('src/index.css','utf8'\\); const checks = ['.db-shell','.db-kpis','.db-bars','.db-log','.impact-kpis','.impact-grid','.impact-tag','.flow-diagram','.flow-node','.final-cta-section','.hero-stats-note']; const missing = checks.filter\\(c => !css.includes\\(c\\)\\); if\\(missing.length\\) console.log\\('Missing CSS:', missing\\); else console.log\\('All CSS present. Total lines:', css.split\\('\\\\n'\\).length\\);\")"
+    ]
+  }
+}
