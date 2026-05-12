@@ -427,4 +427,37 @@ body::before {
   .arch-hero-title { font-size: 28px; }
   .arch-nav-right { gap: 2px; }
   .arch-nav-pill { font-size: 11px; padding: 4px 8px; }
+
+  /* Prevent horizontal overflow from monospace pre blocks */
+  .arch-flow-steps {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 11px;
+  }
+  .arch-mvp-diagram {
+    white-space: pre-wrap;
+    font-size: 11px;
+    padding: 20px 16px;
+  }
+
+  /* Protocol table: block + scroll so it doesn't break layout */
+  .arch-proto-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Conclusion box padding */
+  .arch-conclusion { padding: 24px 20px; }
+
+  /* Hero sub */
+  .arch-hero-sub { font-size: 14px; }
+}
+
+/* ─── 430px ─────────────────────────────────────── */
+@media (max-width: 430px) {
+  .arch-hero-title { font-size: 24px; }
+  .arch-sec-title  { font-size: 18px; }
+  .arch-section    { padding: 60px 12px; }
+  .arch-diagram    { padding: 20px 12px; }
 }

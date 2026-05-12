@@ -167,6 +167,7 @@ function NavBar() {
   const [scrolled, setScrolled] = useState(false)
   const [progress, setProgress] = useState(0)
   const [active, setActive] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -213,11 +214,43 @@ function NavBar() {
         ))}
       </div>
       <div className="nav-actions">
-        <a href="/arch.html" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)', borderColor: 'rgba(5,150,105,0.3)' }}>
+        <a href="/arch.html" className="btn btn-ghost btn-sm nav-arch-btn" style={{ color: 'var(--green)', borderColor: 'rgba(5,150,105,0.3)' }}>
           Architecture ↗
         </a>
-        <a href="#" className="btn btn-ghost btn-sm">GitHub ↗</a>
+        <a href="#" className="btn btn-ghost btn-sm nav-github-btn">GitHub ↗</a>
+        <button
+          className="nav-menu-btn"
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
       </div>
+      {menuOpen && (
+        <div className="nav-mobile-menu">
+          {[
+            ['#problem',      'Problem'],
+            ['#solution',     'Solution'],
+            ['#dashboard',    'Dashboard'],
+            ['#architecture', 'Architecture'],
+            ['#team',         'Team'],
+          ].map(([h, l]) => (
+            <a
+              key={h}
+              href={h}
+              className={`nav-mobile-link${active === h.slice(1) ? ' nav-link-active' : ''}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              {l}
+            </a>
+          ))}
+          <div className="nav-mobile-footer">
+            <a href="/arch.html" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)', borderColor: 'rgba(5,150,105,0.3)' }}>Architecture ↗</a>
+            <a href="#" className="btn btn-ghost btn-sm">GitHub ↗</a>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
@@ -252,8 +285,7 @@ function Hero() {
         </FadeUp>
         <FadeUp delay={0.15}>
           <p className="hero-sub">
-            Temi 로봇이 키즈카페 방문객의 안내·호출을 1차 응대하고,<br />
-            모든 상호작용을 운영 대시보드에 자동으로 기록합니다.
+            Temi 로봇이 키즈카페 방문객의 안내·호출을 1차 응대하고, 모든 상호작용을 운영 대시보드에 자동으로 기록합니다.
           </p>
         </FadeUp>
         <FadeUp delay={0.2}>
@@ -466,21 +498,23 @@ function AdminDashboard() {
             <div className="db-charts">
               <div className="db-panel">
                 <div className="db-panel-title">시간대별 상호작용 수</div>
-                <div className="db-bars">
-                  {hourlyData.map((v, i) => (
-                    <div key={i} className="db-bar-col">
-                      <div className="db-bar-bg">
-                        <div
-                          className="db-bar-fill"
-                          style={{
-                            height: `${(v / maxV) * 100}%`,
-                            background: v === maxV ? 'var(--blue)' : 'rgba(37,99,235,0.28)',
-                          }}
-                        />
+                <div className="db-bars-wrap">
+                  <div className="db-bars">
+                    {hourlyData.map((v, i) => (
+                      <div key={i} className="db-bar-col">
+                        <div className="db-bar-bg">
+                          <div
+                            className="db-bar-fill"
+                            style={{
+                              height: `${(v / maxV) * 100}%`,
+                              background: v === maxV ? 'var(--blue)' : 'rgba(37,99,235,0.28)',
+                            }}
+                          />
+                        </div>
+                        <div className="db-bar-x">{hourLabels[i]}</div>
                       </div>
-                      <div className="db-bar-x">{hourLabels[i]}</div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="db-panel">

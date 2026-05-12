@@ -7,7 +7,8 @@
       "PowerShell(Get-ChildItem -Path \"c:\\\\dev\\\\KF_WEB\" -Recurse -Force | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName | Sort-Object)",
       "Bash(Get-ChildItem -Path \"c:\\\\dev\\\\KF_WEB\" -Exclude \"node_modules\", \".git\", \"dist\")",
       "Bash(Format-Table -AutoSize)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:kf-web-orcin.vercel.app)"
     ]
   }
 }
