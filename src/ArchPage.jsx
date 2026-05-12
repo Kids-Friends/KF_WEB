@@ -75,71 +75,78 @@ export default function ArchPage() {
 
   return (
     <div className="page">
-      {/* NAV */}
-      <nav className="arch-nav" style={{ boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.4)' : 'none' }}>
-        <div className="nav-brand">
-          <div className="nav-brand-dot" />
-          <span className="nav-brand-text">Edge Computing Architecture</span>
-        </div>
-        <div className="nav-right">
+      {/* NAV — matches main site glass style */}
+      <nav className="arch-nav" style={{ boxShadow: scrolled ? '0 4px 24px rgba(100,120,200,0.15)' : 'none' }}>
+        <a href="/" className="arch-nav-brand">
+          <img
+            src="/media/logo.png"
+            alt="Kids-Friends Robot"
+            style={{ height: 26, width: 'auto' }}
+            onError={e => e.target.style.display = 'none'}
+          />
+          <span className="arch-nav-brand-name">Kids-Friends Robot</span>
+        </a>
+        <div className="arch-nav-right">
+          <span className="arch-nav-divider" aria-hidden="true" />
           {['#overview','#diagram','#flows','#protocol','#review','#mvp'].map((h,i) => (
-            <a key={h} href={h} className="nav-pill">{['Overview','Diagram','Flows','Protocol','Review','MVP'][i]}</a>
+            <a key={h} href={h} className="arch-nav-pill">
+              {['Overview','Diagram','Flows','Protocol','Review','MVP'][i]}
+            </a>
           ))}
-          <a href="/" className="nav-pill nav-home">← Main</a>
+          <a href="/" className="arch-nav-pill arch-nav-home">← Main</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="hero">
-        <div className="hero-inner">
-          <div className="hero-tag">🍓 Raspberry Pi Edge Computing</div>
-          <h1 className="hero-title">
+      <section className="arch-hero">
+        <div className="arch-hero-inner">
+          <div className="arch-hero-tag">🍓 Raspberry Pi Edge Computing</div>
+          <h1 className="arch-hero-title">
             <span>Edge Computing</span><br />Communication Architecture
           </h1>
-          <p className="hero-sub">
+          <p className="arch-hero-sub">
             라즈베리파이를 Main Hub로, Spring Boot를 중앙 서버로 하는 로컬 센서 제어 및 실시간 통신 구조.
             클라우드 없이 단일 기기 내에서 완결되는 Edge Computing 설계.
           </p>
-          <div className="hero-badges">
+          <div className="arch-hero-badges">
             {[P.REST,P.WS,P.MQTT,P.IPC,P.JPA].map(t => <Tag key={t} t={t} />)}
           </div>
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* SYSTEM OVERVIEW */}
-      <section className="section" id="overview">
-        <div className="container">
-          <div className="sec-label">System Overview</div>
-          <h2 className="sec-title">전체 시스템 구성</h2>
-          <p className="sec-sub">라즈베리파이 단일 기기 내에서 센서 제어부터 API 서버, DB까지 모두 처리하는 Edge 구조.</p>
-          <div className="overview-grid">
+      <section className="arch-section" id="overview">
+        <div className="arch-container">
+          <div className="arch-sec-label">System Overview</div>
+          <h2 className="arch-sec-title">전체 시스템 구성</h2>
+          <p className="arch-sec-sub">라즈베리파이 단일 기기 내에서 센서 제어부터 API 서버, DB까지 모두 처리하는 Edge 구조.</p>
+          <div className="arch-overview-grid">
             {overviewNodes.map(n => (
-              <div key={n.title} className="card overview-card">
-                <div className="ov-accent" style={{ background: n.color }} />
-                <div className="ov-icon">{n.icon}</div>
-                <div className="ov-title">{n.title}</div>
-                <div className="ov-sub" style={{ color: n.color }}>{n.sub}</div>
-                <div className="ov-body">{n.body}</div>
-                <div className="ov-tags">{n.tags.map(t => <span key={t} className="ov-tag">{t}</span>)}</div>
+              <div key={n.title} className="arch-card arch-overview-card">
+                <div className="arch-ov-accent" style={{ background: n.color }} />
+                <div className="arch-ov-icon">{n.icon}</div>
+                <div className="arch-ov-title">{n.title}</div>
+                <div className="arch-ov-sub" style={{ color: n.color }}>{n.sub}</div>
+                <div className="arch-ov-body">{n.body}</div>
+                <div className="arch-ov-tags">{n.tags.map(t => <span key={t} className="arch-ov-tag">{t}</span>)}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* ARCHITECTURE DIAGRAM */}
-      <section className="section" id="diagram">
-        <div className="container">
-          <div className="sec-label">Architecture Diagram</div>
-          <h2 className="sec-title">통신 구조 다이어그램</h2>
-          <p className="sec-sub">Spring Boot를 중심으로 모든 통신이 흐르는 Hub-and-Spoke 구조.</p>
+      <section className="arch-section" id="diagram">
+        <div className="arch-container">
+          <div className="arch-sec-label">Architecture Diagram</div>
+          <h2 className="arch-sec-title">통신 구조 다이어그램</h2>
+          <p className="arch-sec-sub">Spring Boot를 중심으로 모든 통신이 흐르는 Hub-and-Spoke 구조.</p>
 
           <div className="arch-diagram">
-            {/* External: Temi App */}
             <div className="arch-external">
               <div className="arch-node node-temi" style={{ minWidth: 200 }}>
                 <div className="arch-node-icon">🤖</div>
@@ -156,7 +163,6 @@ export default function ArchPage() {
               </div>
             </div>
 
-            {/* Raspberry Pi wrapper */}
             <div className="rpi-wrapper">
               <div className="rpi-label">🍓 Raspberry Pi — Edge Computing Hub</div>
               <div className="rpi-inner">
@@ -176,7 +182,6 @@ export default function ArchPage() {
                   <div className="arch-node-sub">GPIO Controller</div>
                 </div>
               </div>
-
               <div className="arch-arrows" style={{ marginTop: 16, marginBottom: 4 }}>
                 <div className="arch-arrow-item">
                   <span className="arch-arrow-label aa-jpa">JPA / MySQL</span>
@@ -196,7 +201,6 @@ export default function ArchPage() {
               </div>
             </div>
 
-            {/* External: Sensors */}
             <div className="arch-external">
               <div className="arch-node node-sensor">
                 <div className="arch-node-icon">🌡️</div>
@@ -208,49 +212,49 @@ export default function ArchPage() {
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* COMMUNICATION FLOWS */}
-      <section className="section" id="flows">
-        <div className="container">
-          <div className="sec-label">Communication Flow</div>
-          <h2 className="sec-title">통신 흐름 4가지</h2>
-          <p className="sec-sub">목적에 따라 REST API, WebSocket, Local IPC를 구분해 사용한다.</p>
-          <div className="flow-grid">
+      <section className="arch-section" id="flows">
+        <div className="arch-container">
+          <div className="arch-sec-label">Communication Flow</div>
+          <h2 className="arch-sec-title">통신 흐름 4가지</h2>
+          <p className="arch-sec-sub">목적에 따라 REST API, WebSocket, Local IPC를 구분해 사용한다.</p>
+          <div className="arch-flow-grid">
             {flows.map(f => (
-              <div key={f.num} className="card flow-card">
-                <div className="flow-header">
-                  <div className="flow-num" style={{ background: f.color }}>{'①②③④'[f.num-1]}</div>
+              <div key={f.num} className="arch-card arch-flow-card">
+                <div className="arch-flow-header">
+                  <div className="arch-flow-num" style={{ background: f.color }}>{'①②③④'[f.num-1]}</div>
                   <div>
-                    <div className="flow-title">{f.title}</div>
-                    <div className="flow-purpose">{f.purpose}</div>
+                    <div className="arch-flow-title">{f.title}</div>
+                    <div className="arch-flow-purpose">{f.purpose}</div>
                   </div>
                 </div>
                 <div style={{ display:'flex', gap: 6, flexWrap:'wrap', marginBottom: 12 }}>
                   {f.protos.map(p => <Tag key={p} t={p} />)}
                 </div>
-                <div className="flow-steps">
+                <div className="arch-flow-steps">
                   {f.steps.map((s,i) => <div key={i}>{s}</div>)}
                 </div>
-                <div className="flow-examples">
-                  {f.examples.map(e => <span key={e} className="flow-ex">{e}</span>)}
+                <div className="arch-flow-examples">
+                  {f.examples.map(e => <span key={e} className="arch-flow-ex">{e}</span>)}
                 </div>
-                <p className="flow-note" style={{ marginTop: 12 }}>{f.note}</p>
+                <p className="arch-flow-note" style={{ marginTop: 12 }}>{f.note}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* PROTOCOL TABLE */}
-      <section className="section" id="protocol">
-        <div className="container">
-          <div className="sec-label">Protocol Decision</div>
-          <h2 className="sec-title">프로토콜 역할 구분</h2>
-          <p className="sec-sub">구간별로 통신 목적에 맞는 프로토콜을 선택한 이유.</p>
-          <table className="proto-table">
+      <section className="arch-section" id="protocol">
+        <div className="arch-container">
+          <div className="arch-sec-label">Protocol Decision</div>
+          <h2 className="arch-sec-title">프로토콜 역할 구분</h2>
+          <p className="arch-sec-sub">구간별로 통신 목적에 맞는 프로토콜을 선택한 이유.</p>
+          <table className="arch-proto-table">
             <thead>
               <tr>
                 <th>구간</th><th>목적</th><th>추천 프로토콜</th><th>이유</th>
@@ -259,10 +263,10 @@ export default function ArchPage() {
             <tbody>
               {protoTable.map(r => (
                 <tr key={r.seg}>
-                  <td className="td-segment">{r.seg}</td>
+                  <td className="arch-td-segment">{r.seg}</td>
                   <td>{r.purpose}</td>
                   <td><span className={`proto-badge ${r.cls}`} style={{ fontSize:11 }}>{r.proto}</span></td>
-                  <td className="td-reason">{r.reason}</td>
+                  <td className="arch-td-reason">{r.reason}</td>
                 </tr>
               ))}
             </tbody>
@@ -270,58 +274,58 @@ export default function ArchPage() {
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* REVIEW QUESTIONS */}
-      <section className="section" id="review">
-        <div className="container">
-          <div className="sec-label">Architecture Review</div>
-          <h2 className="sec-title">검토해야 할 핵심 질문</h2>
-          <p className="sec-sub">현재 설계에서 팀이 함께 논의해야 할 아키텍처 결정 포인트.</p>
-          <div className="q-grid">
+      <section className="arch-section" id="review">
+        <div className="arch-container">
+          <div className="arch-sec-label">Architecture Review</div>
+          <h2 className="arch-sec-title">검토해야 할 핵심 질문</h2>
+          <p className="arch-sec-sub">현재 설계에서 팀이 함께 논의해야 할 아키텍처 결정 포인트.</p>
+          <div className="arch-q-grid">
             {questions.map((q,i) => (
-              <div key={i} className="card q-card">
-                <div className="q-num">QUESTION {String(i+1).padStart(2,'0')}</div>
-                <div className="q-text">{q.q}</div>
-                <div className="q-hint">💡 {q.hint}</div>
+              <div key={i} className="arch-card arch-q-card">
+                <div className="arch-q-num">QUESTION {String(i+1).padStart(2,'0')}</div>
+                <div className="arch-q-text">{q.q}</div>
+                <div className="arch-q-hint">💡 {q.hint}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* MVP ARCHITECTURE */}
-      <section className="section" id="mvp">
-        <div className="container">
-          <div className="sec-label">Recommended MVP Architecture</div>
-          <h2 className="sec-title">MVP 추천 구조</h2>
-          <p className="sec-sub">MQTT를 최소화하고 REST + WebSocket + Local IPC로 단순하게 시작한다.</p>
-          <div className="mvp-grid">
+      <section className="arch-section" id="mvp">
+        <div className="arch-container">
+          <div className="arch-sec-label">Recommended MVP Architecture</div>
+          <h2 className="arch-sec-title">MVP 추천 구조</h2>
+          <p className="arch-sec-sub">MQTT를 최소화하고 REST + WebSocket + Local IPC로 단순하게 시작한다.</p>
+          <div className="arch-mvp-grid">
             <div>
-              <div style={{ marginBottom: 16, fontSize: 13, fontWeight: 600, color: 'var(--text-2)' }}>MVP 통신 흐름</div>
-              <div className="mvp-diagram">
-                <div style={{ color:'var(--ws)', fontWeight:700 }}>Temi Android App</div>
-                <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--rest)'}}>REST API</span> / <span style={{color:'var(--ws)'}}>WebSocket</span></div>
-                <div style={{ color:'var(--rest)', fontWeight:700 }}>Spring Boot Server</div>
-                <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--ipc)'}}>Local IPC</span> / <span style={{color:'var(--rest)'}}>REST</span></div>
-                <div style={{ color:'var(--ipc)', fontWeight:700 }}>Python Sensor Runtime</div>
-                <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ <span style={{color:'#f59e0b'}}>GPIO</span></div>
-                <div style={{ color:'#f59e0b', fontWeight:700 }}>Sensor / Actuator</div>
+              <div style={{ marginBottom: 16, fontSize: 13, fontWeight: 600, color: 'var(--arch-text-2)' }}>MVP 통신 흐름</div>
+              <div className="arch-mvp-diagram">
+                <div style={{ color:'var(--arch-ws)',   fontWeight:700 }}>Temi Android App</div>
+                <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--arch-rest)'}}>REST API</span> / <span style={{color:'var(--arch-ws)'}}>WebSocket</span></div>
+                <div style={{ color:'var(--arch-rest)',  fontWeight:700 }}>Spring Boot Server</div>
+                <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--arch-ipc)'}}>Local IPC</span> / <span style={{color:'var(--arch-rest)'}}>REST</span></div>
+                <div style={{ color:'var(--arch-ipc)',   fontWeight:700 }}>Python Sensor Runtime</div>
+                <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ <span style={{color:'#d97706'}}>GPIO</span></div>
+                <div style={{ color:'#d97706',           fontWeight:700 }}>Sensor / Actuator</div>
               </div>
               <div style={{ marginTop: 20 }}>
-                <div style={{ marginBottom: 12, fontSize: 13, fontWeight: 600, color: 'var(--text-2)' }}>MQTT 도입이 필요한 경우</div>
-                <div className="when-grid">
-                  <div className="card when-card-yes">
-                    <div className="when-title"><span style={{color:'var(--mqtt)'}}>▶</span> MQTT 도입 시점</div>
-                    <ul className="when-list yes-list">
+                <div style={{ marginBottom: 12, fontSize: 13, fontWeight: 600, color: 'var(--arch-text-2)' }}>MQTT 도입이 필요한 경우</div>
+                <div className="arch-when-grid">
+                  <div className="arch-card arch-when-yes">
+                    <div className="arch-when-title"><span style={{color:'var(--arch-mqtt)'}}>▶</span> MQTT 도입 시점</div>
+                    <ul className="arch-when-list arch-yes-list">
                       {['센서 노드가 여러 개로 증가','ESP32/Arduino 외부 MCU 추가','센서·서버 물리적 분리','비동기 Pub/Sub 구조 필요','이벤트 양이 많아지는 경우'].map(i => <li key={i}>{i}</li>)}
                     </ul>
                   </div>
-                  <div className="card when-card-no">
-                    <div className="when-title"><span style={{color:'var(--ipc)'}}>◆</span> MQTT 없이 가능한 경우</div>
-                    <ul className="when-list no-list">
+                  <div className="arch-card arch-when-no">
+                    <div className="arch-when-title"><span style={{color:'var(--arch-ipc)'}}>◆</span> MQTT 없이 가능한 경우</div>
+                    <ul className="arch-when-list arch-no-list">
                       {['센서가 라즈베리파이에 직접 연결','모든 코드가 같은 기기에서 실행','센서 노드가 1~2개인 경우','단순 주기적 데이터 저장'].map(i => <li key={i}>{i}</li>)}
                     </ul>
                   </div>
@@ -329,8 +333,8 @@ export default function ArchPage() {
               </div>
             </div>
             <div>
-              <div style={{ marginBottom: 16, fontSize: 13, fontWeight: 600, color: 'var(--text-2)' }}>MVP의 장점</div>
-              <ul className="mvp-pros">
+              <div style={{ marginBottom: 16, fontSize: 13, fontWeight: 600, color: 'var(--arch-text-2)' }}>MVP의 장점</div>
+              <ul className="arch-mvp-pros">
                 {[
                   'MQTT 브로커(Mosquitto 등) 설치·관리 불필요',
                   'Spring Boot와 Python 간 통신을 REST로 통일해 디버깅 용이',
@@ -341,17 +345,17 @@ export default function ArchPage() {
                 ].map(t => <li key={t}>{t}</li>)}
               </ul>
               <div style={{ marginTop: 28 }}>
-                <div style={{ marginBottom: 12, fontSize: 13, fontWeight: 600, color: 'var(--text-2)' }}>Future Expansion — MQTT 도입 후</div>
-                <div className="mvp-diagram" style={{ fontSize: 12 }}>
-                  <div style={{ color:'var(--ws)', fontWeight:700 }}>Temi Android App</div>
-                  <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ REST / WebSocket</div>
-                  <div style={{ color:'var(--rest)', fontWeight:700 }}>Spring Boot Server</div>
-                  <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--mqtt)'}}>MQTT Subscribe</span></div>
-                  <div style={{ color:'var(--mqtt)', fontWeight:700 }}>MQTT Broker (Mosquitto)</div>
-                  <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ MQTT Publish</div>
-                  <div style={{ color:'var(--ipc)', fontWeight:700 }}>ESP32 / Arduino / RPi GPIO</div>
-                  <div style={{ color:'var(--text-3)', paddingLeft:8 }}>⇅ SPI / I2C / GPIO</div>
-                  <div style={{ color:'#f59e0b', fontWeight:700 }}>Multiple Sensor Nodes</div>
+                <div style={{ marginBottom: 12, fontSize: 13, fontWeight: 600, color: 'var(--arch-text-2)' }}>Future Expansion — MQTT 도입 후</div>
+                <div className="arch-mvp-diagram" style={{ fontSize: 12 }}>
+                  <div style={{ color:'var(--arch-ws)', fontWeight:700 }}>Temi Android App</div>
+                  <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ REST / WebSocket</div>
+                  <div style={{ color:'var(--arch-rest)', fontWeight:700 }}>Spring Boot Server</div>
+                  <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ <span style={{color:'var(--arch-mqtt)'}}>MQTT Subscribe</span></div>
+                  <div style={{ color:'var(--arch-mqtt)', fontWeight:700 }}>MQTT Broker (Mosquitto)</div>
+                  <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ MQTT Publish</div>
+                  <div style={{ color:'var(--arch-ipc)', fontWeight:700 }}>ESP32 / Arduino / RPi GPIO</div>
+                  <div style={{ color:'var(--arch-text-3)', paddingLeft:8 }}>⇅ SPI / I2C / GPIO</div>
+                  <div style={{ color:'#d97706', fontWeight:700 }}>Multiple Sensor Nodes</div>
                 </div>
               </div>
             </div>
@@ -359,15 +363,15 @@ export default function ArchPage() {
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="arch-divider" />
 
       {/* CONCLUSION */}
-      <section className="section">
-        <div className="container">
-          <div className="sec-label">Conclusion</div>
-          <h2 className="sec-title">핵심 결론</h2>
-          <div className="conclusion" style={{ marginTop: 32 }}>
-            <p className="conclusion-text">
+      <section className="arch-section">
+        <div className="arch-container">
+          <div className="arch-sec-label">Conclusion</div>
+          <h2 className="arch-sec-title">핵심 결론</h2>
+          <div className="arch-conclusion" style={{ marginTop: 32 }}>
+            <p className="arch-conclusion-text">
               <strong>Spring Boot를 중앙 통제 서버로 두고, Temi App · DB · 센서 제어 코드를 연결하는 방향은 적절하다.</strong>
               <br /><br />
               다만 센서가 라즈베리파이에 직접 연결되어 있고, Spring Boot와 Python 코드가{' '}
@@ -382,10 +386,8 @@ export default function ArchPage() {
 
       {/* FOOTER */}
       <footer className="arch-footer">
-        <p>Kids-Friends Robot — Edge Computing Architecture Document · 2025</p>
-        <p style={{ marginTop: 8 }}>
-          <a href="/" style={{ color:'var(--rest)', fontSize:13 }}>← 메인 페이지로 돌아가기</a>
-        </p>
+        <p>Kids-Friends Robot — Edge Computing Architecture · 2025</p>
+        <a href="/" className="arch-footer-link">← 메인 페이지로 돌아가기</a>
       </footer>
     </div>
   )

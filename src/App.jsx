@@ -1,93 +1,109 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { MessageCircle, Bell, ShieldAlert, MapPin, Volume2, Bot, Gamepad2, BellRing, Database, BarChart2 } from 'lucide-react'
+import { MessageCircle, Bell, ShieldAlert, MapPin, Bot, BellRing, BarChart2 } from 'lucide-react'
 import HeroParticleBackground from './HeroParticleBackground'
 
 /* ── DATA ─────────────────────────────────────────────────── */
 const problems = [
-  { icon: MessageCircle, label: '반복 질문 응대', body: '하루 수십 회 반복되는 위치·요금·규칙 문의가 직원의 집중력을 지속적으로 분산시킵니다.', accent: 'var(--pink)', dim: 'var(--pink-dim)' },
-  { icon: Bell,          label: '잦은 직원 호출', body: '모든 요청에 직원이 직접 이동해야 하는 구조로 동선 낭비와 피로도가 누적됩니다.',       accent: 'var(--yellow)', dim: 'var(--yellow-dim)' },
-  { icon: ShieldAlert,   label: '안전관리 집중도 저하', body: '반복 응대로 인해 안전 모니터링이 끊기고, 돌발 상황 대응 능력이 저하됩니다.', accent: 'var(--blue)', dim: 'var(--blue-dim)' },
+  {
+    icon: MessageCircle,
+    label: '반복 질문 응대',
+    body: '하루 수십 회 반복되는 위치·요금·규칙 문의가 직원의 집중력을 지속적으로 분산시킵니다.',
+    evidence: '현장 관찰 기반 — 일 평균 50회 이상 직접 응대',
+    accent: 'var(--pink)',
+    dim: 'var(--pink-dim)',
+  },
+  {
+    icon: Bell,
+    label: '잦은 직원 호출',
+    body: '모든 요청에 직원이 직접 이동해야 하는 구조로 동선 낭비와 피로도가 누적됩니다.',
+    evidence: '호출당 평균 3분 이상 이동 동선 소모',
+    accent: 'var(--yellow)',
+    dim: 'var(--yellow-dim)',
+  },
+  {
+    icon: ShieldAlert,
+    label: '안전관리 집중도 저하',
+    body: '반복 응대로 인해 안전 모니터링이 끊기고, 돌발 상황 대응 능력이 저하됩니다.',
+    evidence: '안전 공백 — 반복 응대 중 발생하는 관리 사각지대',
+    accent: 'var(--blue)',
+    dim: 'var(--blue-dim)',
+  },
 ]
 
-const reasons = [
-  { emoji: '💬', title: '반복 질문 최다 현장', body: '아이·보호자의 반복 질문이 가장 많이 발생하는 공간', accent: 'var(--pink)', dim: 'var(--pink-dim)' },
-  { emoji: '🚶', title: '직접 이동 안내 필요', body: '직원이 직접 이동하며 안내해야 하는 구조적 문제',     accent: 'var(--blue)', dim: 'var(--blue-dim)' },
-  { emoji: '⚠️', title: '안전 집중 필요',      body: '반복 응대로 안전관리 집중이 어려운 현실',           accent: 'var(--yellow)', dim: 'var(--yellow-dim)' },
-  { emoji: '🤖', title: 'Temi 최적 적합',      body: 'Temi의 이동·화면·음성·자율주행과 최고 궁합',        accent: 'var(--green)', dim: 'var(--green-dim)' },
-  { emoji: '📊', title: '데이터 확장 가능',    body: '질문/호출 로그를 운영 데이터로 확장 가능',           accent: 'var(--purple)', dim: 'var(--purple-dim)' },
+const storyboard = [
+  {
+    act: '01',
+    title: '방문 · 질문',
+    icon: '👧',
+    desc: '아이 또는 보호자가 Temi에게 말을 걸거나 화면을 터치합니다.',
+    tags: ['음성 질문', '화면 터치', '호출 버튼'],
+    color: 'var(--pink)',
+    dim: 'var(--pink-dim)',
+  },
+  {
+    act: '02',
+    title: 'Temi 응대',
+    icon: '🤖',
+    desc: 'Temi가 즉시 음성으로 답하고, 필요시 해당 장소까지 직접 이동하여 안내합니다.',
+    tags: ['AI 답변', '자율 이동', '호출 중계'],
+    color: 'var(--blue)',
+    dim: 'var(--blue-dim)',
+  },
+  {
+    act: '03',
+    title: '데이터 축적',
+    icon: '📊',
+    desc: '모든 상호작용이 실시간으로 관리자 대시보드에 자동 기록됩니다.',
+    tags: ['이벤트 로깅', '통계 집계', '알림 발송'],
+    color: 'var(--green)',
+    dim: 'var(--green-dim)',
+  },
 ]
 
-const features = [
-  { icon: MapPin,    label: '놀이존 위치 안내',     body: '목적지까지 직접 이동하며 음성으로 안내합니다',          accent: 'var(--blue)', dim: 'var(--blue-dim)' },
-  { icon: Volume2,   label: '음성·화면 규칙 설명', body: '이용 규칙을 음성과 화면으로 즉시 전달합니다',         accent: 'var(--pink)', dim: 'var(--pink-dim)' },
-  { icon: Bot,       label: 'AI 자유 질문 응답',   body: 'LLM 기반으로 자연스럽고 정확하게 대화합니다',            accent: 'var(--green)', dim: 'var(--green-dim)' },
-  { icon: Gamepad2,  label: '퀴즈·미션 인터랙션', body: '아이와 놀이형 대화로 즐거운 경험을 제공합니다',                  accent: 'var(--purple)', dim: 'var(--purple-dim)' },
-  { icon: BellRing,  label: '직원 호출 접수',      body: '버튼 또는 화면 터치로 즉시 직원을 호출합니다',            accent: 'var(--yellow)', dim: 'var(--yellow-dim)' },
-  { icon: Database,  label: '로그 자동 저장',      body: '모든 질문과 호출 이력이 DB에 자동 기록됩니다',         accent: 'var(--blue)', dim: 'var(--blue-dim)' },
-  { icon: BarChart2, label: '관리자 통계 대시보드', body: '운영 현황과 트렌드를 실시간으로 확인합니다',                  accent: 'var(--pink)', dim: 'var(--pink-dim)' },
+const coreFeatures = [
+  { icon: MapPin,    label: '이동형 위치 안내',  body: '목적지까지 직접 이동하며 음성으로 안내합니다',       accent: 'var(--blue)',   dim: 'var(--blue-dim)' },
+  { icon: Bot,       label: 'AI 자유 대화',       body: 'LLM 기반으로 자연스러운 질문에 즉시 응답합니다',    accent: 'var(--green)',  dim: 'var(--green-dim)' },
+  { icon: BellRing,  label: '직원 호출 중계',     body: '버튼·화면 터치로 즉시 담당자에게 알림을 전송합니다', accent: 'var(--yellow)', dim: 'var(--yellow-dim)' },
+  { icon: BarChart2, label: '운영 대시보드 연동', body: '질문·호출·혼잡도를 실시간으로 모니터링합니다',       accent: 'var(--purple)', dim: 'var(--purple-dim)' },
 ]
 
 const modules = [
-  { bar: 'var(--blue)',   name: 'Temi Robot Module',      tech: 'Temi SDK · Android Java',         items: ['이동 안내', '음성 응답', '화면 표시'] },
-  { bar: 'var(--purple)', name: 'AI Conversation Module', tech: 'LLM API · Prompt Engineering',    items: ['의도 분류', '자연어 답변', 'JSON 응답'] },
-  { bar: 'var(--green)',  name: 'Sensor Module',          tech: 'Arduino · ESP32 · Raspberry Pi',  items: ['호출 버튼', '접근 감지', '이벤트 수신'] },
-  { bar: 'var(--yellow)', name: 'Backend Module',         tech: 'Spring Boot · MySQL',             items: ['REST API', '이벤트 저장', '명령 관리'] },
-  { bar: 'var(--pink)',   name: 'Realtime Module',        tech: 'WebSocket · MQTT',                items: ['관리자 알림', '로봇 상태 push'] },
-  { bar: '#2dd4bf',       name: 'Admin Web Module',       tech: 'React · Next.js',                 items: ['이벤트 로그', '호출 내역', '통계 확인'] },
+  { color: 'var(--blue)',   name: 'Temi Robot',  tech: 'Android Java · Temi SDK' },
+  { color: 'var(--purple)', name: 'AI / LLM',    tech: 'LLM API · Prompt Engineering' },
+  { color: 'var(--green)',  name: 'Sensor',       tech: 'Arduino · ESP32 · Raspberry Pi' },
+  { color: 'var(--yellow)', name: 'Backend',      tech: 'Spring Boot · MySQL' },
+  { color: 'var(--pink)',   name: 'Realtime',     tech: 'WebSocket · MQTT' },
+  { color: '#2dd4bf',       name: 'Admin Web',    tech: 'React · Next.js' },
 ]
 
-const steps = [
-  { text: '아이가 "미끄럼틀 어디 있어?" 질문', color: 'var(--pink)' },
-  { text: 'Temi가 음성으로 즉시 답변',          color: 'var(--blue)' },
-  { text: 'Temi가 해당 놀이존까지 직접 이동 안내', color: 'var(--green)' },
-  { text: '아이가 "퀴즈 해줘" 요청 → LLM 인터랙션', color: 'var(--yellow)' },
-  { text: '버튼 또는 화면으로 직원 호출',        color: 'var(--purple)' },
-  { text: '관리자 페이지에 호출 이벤트 실시간 표시', color: 'var(--blue)' },
-  { text: '질문/호출 로그가 DB에 자동 저장',     color: 'var(--green)' },
-]
-
-const demoItems = [
-  { emoji: '🗺️', label: '놀이존 이동 안내' },
-  { emoji: '🤖', label: 'AI 대화 응답' },
-  { emoji: '🔔', label: '직원 호출' },
-  { emoji: '📊', label: '관리자 대시보드' },
-]
-
+/* ── 팀원 정보: name, github 필드를 실제 값으로 교체하세요 ─── */
 const team = [
-  { emoji: '🧭', role: 'SW Lead',            desc: '총괄 기획·설계' },
-  { emoji: '🗄️', role: 'Backend Developer',  desc: 'API·DB·이벤트 흐름' },
-  { emoji: '⚡', role: 'Sensor Engineer',    desc: 'Arduino·ESP32 제어' },
-  { emoji: '🤖', role: 'Temi Developer',     desc: 'SDK·Android 제어' },
-  { emoji: '🖥️', role: 'Frontend Developer', desc: 'Admin Web·UI' },
+  { emoji: '🧭', name: '팀원 이름', role: 'SW Lead',            desc: '총괄 기획·설계',  tech: 'System Design · Project Management', github: '#' },
+  { emoji: '🗄️', name: '팀원 이름', role: 'Backend Developer',  desc: 'API·DB·이벤트 흐름', tech: 'Spring Boot · MySQL · REST API',  github: '#' },
+  { emoji: '⚡', name: '팀원 이름', role: 'Sensor Engineer',    desc: 'Arduino·ESP32 제어', tech: 'Arduino · ESP32 · Raspberry Pi',  github: '#' },
+  { emoji: '🤖', name: '팀원 이름', role: 'Temi Developer',     desc: 'SDK·Android 제어',   tech: 'Android Java · Temi SDK',          github: '#' },
+  { emoji: '🖥️', name: '팀원 이름', role: 'Frontend Developer', desc: 'Admin Web·UI',        tech: 'React · Next.js · CSS',            github: '#' },
 ]
 
 /* ── Dashboard mock data ──────────────────────────────────── */
-const dbLogs = [
-  { time: '17:42', icon: '💬', text: '"화장실 어디예요?" → 음성 안내 완료' },
-  { time: '17:38', icon: '🗺️', text: '"미끄럼틀 어디예요?" → 이동 안내 시작' },
-  { time: '17:31', icon: '🔔', text: '직원 호출 접수 → 담당자 알림 전송' },
-  { time: '17:22', icon: '🤖', text: '"요금이 얼마예요?" → AI 자동 답변' },
-  { time: '17:15', icon: '⚠️', text: '근접 감지 이벤트 → 안전 알림 발송' },
-]
-
 const hourlyData = [8, 12, 5, 6, 9, 18, 24, 31, 28, 22, 16, 14]
 const hourLabels = ['9시','10시','11시','12시','13시','14시','15시','16시','17시','18시','19시','20시']
 
 const top5Questions = [
-  { rank: 1, q: '화장실이 어디 있어요?', count: 34, color: 'var(--blue)' },
-  { rank: 2, q: '미끄럼틀 어디 있어요?', count: 28, color: 'var(--pink)' },
-  { rank: 3, q: '이용 요금이 얼마예요?', count: 21, color: 'var(--purple)' },
-  { rank: 4, q: '밥은 어디서 먹어요?',   count: 17, color: 'var(--green)' },
+  { rank: 1, q: '화장실이 어디 있어요?',    count: 34, color: 'var(--blue)' },
+  { rank: 2, q: '미끄럼틀 어디 있어요?',    count: 28, color: 'var(--pink)' },
+  { rank: 3, q: '이용 요금이 얼마예요?',    count: 21, color: 'var(--purple)' },
+  { rank: 4, q: '밥은 어디서 먹어요?',       count: 17, color: 'var(--green)' },
   { rank: 5, q: '보호자 대기 공간 있나요?', count: 12, color: 'var(--yellow)' },
 ]
 
 const alertLogs = [
-  { time: '17:51', level: 'warn',  icon: '⚠️', text: '혼잡 감지 — 볼풀 영역 입장 인원 초과' },
-  { time: '17:44', level: 'call',  icon: '🔔', text: '보호자 호출 — 미끄럼틀 구역 3번 테이블' },
-  { time: '17:38', level: 'info',  icon: '✅', text: '직원 호출 완료 — 응대 시간 42초' },
-  { time: '17:31', level: 'danger',icon: '🚨', text: '근접 감지 이벤트 — 안전 알림 발송됨' },
-  { time: '17:22', level: 'call',  icon: '🔔', text: '직원 호출 접수 — 입구 안내 데스크' },
+  { time: '17:51', level: 'warn',   icon: '⚠️', text: '혼잡 감지 — 볼풀 영역 입장 인원 초과' },
+  { time: '17:44', level: 'call',   icon: '🔔', text: '보호자 호출 — 미끄럼틀 구역 3번 테이블' },
+  { time: '17:38', level: 'info',   icon: '✅', text: '직원 호출 완료 — 응대 시간 42초' },
+  { time: '17:31', level: 'danger', icon: '🚨', text: '근접 감지 이벤트 — 안전 알림 발송됨' },
+  { time: '17:22', level: 'call',   icon: '🔔', text: '직원 호출 접수 — 입구 안내 데스크' },
 ]
 
 const peakHours = [
@@ -96,16 +112,6 @@ const peakHours = [
   { time: '14시–15시', load: 72, label: '혼잡' },
   { time: '11시–12시', load: 55, label: '보통' },
   { time: '10시–11시', load: 38, label: '여유' },
-]
-
-/* ── Impact data ─────────────────────────────────────────── */
-const impactRows = [
-  { icon: '💬', cat: '반복 질문 응대',   before: '직원이 일 평균 50회 직접 응대 → 집중력 분산', after: '로봇 100% 1차 안내 → 직원 응대 부담 제거', color: 'var(--pink)' },
-  { icon: '🛡️', cat: '안전 모니터링',   before: '안내 업무와 안전 관리를 동시에 수행',         after: '안전 관리 전담 가용 시간 약 40% 확보',   color: 'var(--blue)' },
-  { icon: '⏱️', cat: '호출 대응 속도',  before: '직원 위치에 따라 응대 지연 발생(평균 3분↑)', after: '관리자 대시보드 실시간 알림 → 즉시 대응', color: 'var(--yellow)' },
-  { icon: '🗺️', cat: '이동 안내',       before: '직원이 직접 동행하여 안내 — 동선 낭비',       after: 'Temi 자율주행으로 완전 대체',             color: 'var(--green)' },
-  { icon: '📊', cat: '운영 데이터',     before: '현장 경험과 직관에만 의존',                   after: '질문·호출·혼잡 데이터 자동 축적 및 분석', color: 'var(--purple)' },
-  { icon: '😊', cat: '고객 만족도',     before: '대기·지연으로 인한 불만 발생',               after: '즉각 응대로 방문 경험 품질 향상',         color: '#0891b2' },
 ]
 
 /* ── HELPERS ──────────────────────────────────────────────── */
@@ -159,28 +165,57 @@ function GlassCard({ children, className = '', style = {}, accentColor }) {
 /* ── NAV ─────────────────────────────────────────────────── */
 function NavBar() {
   const [scrolled, setScrolled] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [active, setActive] = useState('')
+
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', fn)
-    return () => window.removeEventListener('scroll', fn)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10)
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(max > 0 ? window.scrollY / max : 0)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const ids = ['problem', 'solution', 'dashboard', 'architecture', 'team']
+    const obs = new IntersectionObserver(
+      entries => { entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) }) },
+      { rootMargin: '-40% 0px -55% 0px' }
+    )
+    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el) })
+    return () => obs.disconnect()
   }, [])
 
   return (
     <nav className="nav" style={{ boxShadow: scrolled ? '0 4px 24px rgba(100,120,200,0.15)' : 'none' }}>
+      <div className="nav-progress" style={{ width: `${progress * 100}%` }} />
       <div className="nav-logo">
-        <img src="/media/logo.png" alt="Kids-Friends Robot" onError={e => e.target.style.display='none'} />
+        <img src="/media/logo.png" alt="Kids-Friends Robot" onError={e => e.target.style.display = 'none'} />
         <span className="nav-logo-name">Kids-Friends Robot</span>
       </div>
       <div className="nav-links">
         {[
-          ['#problem','Problem'],['#solution','Solution'],['#dashboard','Dashboard'],
-          ['#impact','Impact'],['#flow','System'],['#team','Team'],
-        ].map(([h,l]) => (
-          <a key={h} href={h} style={{ color: 'var(--text-2)' }}>{l}</a>
+          ['#problem',      'Problem'],
+          ['#solution',     'Solution'],
+          ['#dashboard',    'Dashboard'],
+          ['#architecture', 'Architecture'],
+          ['#team',         'Team'],
+        ].map(([h, l]) => (
+          <a
+            key={h}
+            href={h}
+            className={`nav-link${active === h.slice(1) ? ' nav-link-active' : ''}`}
+          >
+            {l}
+          </a>
         ))}
       </div>
       <div className="nav-actions">
-        <a href="/arch.html" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)', borderColor: 'rgba(21,168,105,0.3)' }}>Architecture ↗</a>
+        <a href="/arch.html" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)', borderColor: 'rgba(5,150,105,0.3)' }}>
+          Architecture ↗
+        </a>
         <a href="#" className="btn btn-ghost btn-sm">GitHub ↗</a>
       </div>
     </nav>
@@ -189,12 +224,15 @@ function NavBar() {
 
 /* ── HERO ────────────────────────────────────────────────── */
 function Hero() {
-  const ref = useRef(null)
-  const seen = useInView(ref)
   return (
-    <section className="hero" ref={ref} id="hero">
+    <section className="hero" id="hero">
       <HeroParticleBackground />
-      <motion.div className="hero-inner" variants={stagger} initial="hidden" animate={seen ? 'visible' : 'hidden'}>
+      <motion.div
+        className="hero-inner"
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+      >
         <FadeUp>
           <div className="hero-badge">
             <span className="hero-badge-dot" />
@@ -202,39 +240,30 @@ function Hero() {
           </div>
         </FadeUp>
         <FadeUp delay={0.05}>
-          <img src="/media/logo.png" alt="Kids-Friends" className="hero-logo" onError={e => { e.target.style.display='none' }} />
+          <img src="/media/logo.png" alt="Kids-Friends" className="hero-logo" onError={e => { e.target.style.display = 'none' }} />
         </FadeUp>
         <FadeUp delay={0.1}>
           <h1 className="hero-title">
-            <span style={{ background: 'linear-gradient(135deg, #1a2a6c 0%, #3b7ef4 50%, #7c5de8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>아이들의 친구,</span><br />
+            <span style={{ background: 'linear-gradient(135deg, #1a2a6c 0%, #3b7ef4 50%, #7c5de8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              아이들의 친구,
+            </span><br />
             스마트 운영 솔루션
           </h1>
         </FadeUp>
         <FadeUp delay={0.15}>
           <p className="hero-sub">
-            반복 응대를 로봇이 대신 처리하고, 직원은 안전과 서비스 품질에 집중합니다.<br />
-            모든 상호작용은 운영 데이터로 자동 축적됩니다.
+            Temi 로봇이 키즈카페 방문객의 안내·호출을 1차 응대하고,<br />
+            모든 상호작용을 운영 대시보드에 자동으로 기록합니다.
           </p>
         </FadeUp>
         <FadeUp delay={0.2}>
           <div className="hero-cta">
             <a href="#dashboard" className="btn btn-primary hero-cta-main">
-              <span style={{fontSize:16}}>📊</span> 관리자 대시보드 미리보기
+              <span style={{ fontSize: 16 }}>📊</span> 관리자 대시보드 보기
             </a>
-            <a href="#flow" className="btn btn-ghost hero-cta-sub">서비스 흐름 살펴보기 →</a>
+            <a href="#solution" className="btn btn-ghost hero-cta-sub">서비스 흐름 살펴보기 →</a>
           </div>
-          <div className="hero-cta-hint">실제 운영 화면 목업을 지금 바로 확인하세요</div>
-        </FadeUp>
-        <FadeUp delay={0.28}>
-          <div className="hero-stats">
-            {[['42%','직원 호출 감소'],['1.8초','AI 응답 시간'],['100%','자동 응대']].map(([v,l]) => (
-              <div key={l}>
-                <div className="hero-stat-val">{v}</div>
-                <div className="hero-stat-label">{l}</div>
-              </div>
-            ))}
-          </div>
-          <p className="hero-stats-note">* 시나리오 기반 예상 수치</p>
+          <div className="hero-cta-hint">시나리오 기반 운영 화면 목업을 확인하세요</div>
         </FadeUp>
       </motion.div>
     </section>
@@ -246,13 +275,84 @@ function Problem() {
   return (
     <Section id="problem">
       <div className="container">
-        <FadeUp><div className="section-header center">
-          <div className="label pink">Problem</div>
-          <h2 className="section-title">키즈카페 운영의 3가지 핵심 과제</h2>
-          <p className="section-sub center">반복되는 비효율이 직원의 안전 집중도와 서비스 품질을 낮춥니다</p>
-        </div></FadeUp>
+        <FadeUp>
+          <div className="section-header center">
+            <div className="label pink">Problem</div>
+            <h2 className="section-title">키즈카페 운영의 3가지 핵심 과제</h2>
+            <p className="section-sub center">반복되는 비효율이 직원의 안전 집중도와 서비스 품질을 낮춥니다</p>
+          </div>
+        </FadeUp>
         <div className="grid-3">
-          {problems.map(({ icon: Icon, label, body, accent, dim }) => (
+          {problems.map(({ icon: Icon, label, body, evidence, accent, dim }) => (
+            <GlassCard key={label} accentColor={accent}>
+              <div className="card-icon" style={{ background: dim }}><Icon size={20} color={accent} /></div>
+              <div className="card-title">{label}</div>
+              <div className="card-body">{body}</div>
+              <div className="card-evidence" style={{ borderColor: accent + '30', color: accent }}>
+                → {evidence}
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </div>
+    </Section>
+  )
+}
+
+/* ── HOW IT WORKS (Solution + Features + Scenario 통합) ───── */
+function HowItWorks() {
+  return (
+    <Section id="solution">
+      <div className="container-wide">
+        <FadeUp>
+          <div className="section-header center">
+            <div className="label blue">How It Works</div>
+            <h2 className="section-title">어떻게 작동하나요?</h2>
+            <p className="section-sub center">방문객의 한 마디가 운영 데이터가 되는 과정</p>
+          </div>
+        </FadeUp>
+
+        {/* 3-act storyboard */}
+        <FadeUp>
+          <div className="storyboard">
+            {storyboard.map((act, i) => (
+              <div key={act.act} className="storyboard-item">
+                <div className="storyboard-card glass" style={{ borderTop: `3px solid ${act.color}` }}>
+                  <div className="storyboard-act-num" style={{ color: act.color }}>Act {act.act}</div>
+                  <div className="storyboard-icon">{act.icon}</div>
+                  <div className="storyboard-title">{act.title}</div>
+                  <div className="storyboard-desc">{act.desc}</div>
+                  <div className="storyboard-tags">
+                    {act.tags.map(t => (
+                      <span
+                        key={t}
+                        className="storyboard-tag"
+                        style={{ color: act.color, background: act.dim, border: `1px solid ${act.color}30` }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {i < storyboard.length - 1 && (
+                  <div className="storyboard-arrow" aria-hidden="true">→</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+
+        {/* 4 core features */}
+        <FadeUp>
+          <div className="section-header center" style={{ marginTop: 64 }}>
+            <div className="label green">Core Features</div>
+            <h3 style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--text)', marginBottom: 10 }}>
+              4가지 핵심 기능
+            </h3>
+          </div>
+        </FadeUp>
+        <div className="grid-4">
+          {coreFeatures.map(({ icon: Icon, label, body, accent, dim }) => (
             <GlassCard key={label} accentColor={accent}>
               <div className="card-icon" style={{ background: dim }}><Icon size={20} color={accent} /></div>
               <div className="card-title">{label}</div>
@@ -260,71 +360,52 @@ function Problem() {
             </GlassCard>
           ))}
         </div>
-      </div>
-    </Section>
-  )
-}
 
-/* ── IDEA ────────────────────────────────────────────────── */
-function Idea() {
-  return (
-    <Section id="idea">
-      <div className="container">
-        <FadeUp><div className="section-header center">
-          <div className="label" style={{ color: 'var(--purple)' }}>Idea Story</div>
-          <h2 className="section-title">왜 키즈카페인가?</h2>
-          <p className="section-sub center">여러 시나리오 중 키즈카페를 선택한 이유</p>
-        </div></FadeUp>
-        <div className="grid-3" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
-          {reasons.map(({ emoji, title, body, accent, dim }) => (
-            <GlassCard key={title} accentColor={accent}>
-              <div className="card-icon" style={{ background: dim, fontSize: 20 }}>{emoji}</div>
-              <div className="card-title">{title}</div>
-              <div className="card-body">{body}</div>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )
-}
-
-/* ── SOLUTION ────────────────────────────────────────────── */
-function Solution() {
-  return (
-    <Section id="solution">
-      <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
+        {/* Temi callout + compact impact table */}
+        <div className="solution-bottom">
           <FadeUp>
-            <div className="label blue">Solution</div>
-            <h2 className="section-title" style={{ marginTop: 8 }}>Kids-Friends Robot</h2>
-            <p style={{ fontSize: 17, lineHeight: 1.7, color: 'var(--text-2)', marginTop: 16 }}>
-              로봇 상호작용 데이터를 실시간 어드민 대시보드와 연결해,
-              직원이 <strong style={{ color: 'var(--text)' }}>안내·호출·운영 현황</strong>을 한눈에 파악하고
-              더 효율적으로 현장을 관리할 수 있는 키즈카페 운영 보조 서비스입니다.
-            </p>
-            <p style={{ fontSize: 17, lineHeight: 1.7, color: 'var(--text-2)', marginTop: 12 }}>
-              반복 질문은 <strong style={{ color: 'var(--pink)' }}>로봇이 즉시 처리</strong>하고,
-              직원은 안전관리와 고품질 서비스에 집중할 수 있습니다.
-            </p>
-          </FadeUp>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {[
-              { t: '이동형 친구 UX',  b: '고정 키오스크가 아닌 아이 곁으로 직접 다가가는 경험', c: 'var(--pink)' },
-              { t: '운영 데이터 축적', b: '모든 질문·호출이 대시보드 분석 데이터로 자동 전환', c: 'var(--blue)' },
-              { t: '통합 시스템',     b: '센서 + AI + 로봇 + 백엔드가 하나의 흐름으로 연결',   c: 'var(--green)' },
-            ].map(({ t, b, c }) => (
-              <GlassCard key={t} style={{ padding: '20px 24px' }}>
-                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                  <div style={{ width: 3, height: 40, background: c, borderRadius: 3, flexShrink: 0, marginTop: 2 }} />
-                  <div>
-                    <div className="card-title" style={{ marginBottom: 4 }}>{t}</div>
-                    <div className="card-body">{b}</div>
-                  </div>
+            <div className="temi-callout glass">
+              <div className="temi-callout-icon">🤖</div>
+              <div>
+                <div className="temi-callout-title">왜 Temi 로봇인가?</div>
+                <div className="temi-callout-body">
+                  Temi는 자율주행·음성 인터랙션·화면 표시를 하나의 기기에서 지원하는 이동형 소셜 로봇입니다.
+                  고정 키오스크와 달리 아이 곁으로 직접 다가가는 경험을 제공합니다.
                 </div>
-              </GlassCard>
-            ))}
-          </div>
+              </div>
+            </div>
+          </FadeUp>
+
+          <FadeUp>
+            <div className="impact-table-wrap glass">
+              <div className="impact-table-header">
+                <div className="label" style={{ color: 'var(--green)', marginBottom: 4 }}>Expected Impact</div>
+                <p style={{ fontSize: 12, color: 'var(--text-3)' }}>* 시나리오 기반 목표 수치 — 실제 운영 결과와 다를 수 있습니다</p>
+              </div>
+              <table className="impact-table">
+                <thead>
+                  <tr>
+                    <th>항목</th>
+                    <th>도입 전 (현재)</th>
+                    <th>목표 (시나리오)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { cat: '직원 호출 횟수',    before: '일 평균 50회 직접 응대',   after: '목표 42% 감소 — 로봇 1차 응대로 대체' },
+                    { cat: 'AI 응답 속도',      before: '직원 이동 후 응대 (3분↑)', after: '목표 1.8초 이내 즉시 응답' },
+                    { cat: '안전 집중 가용 시간', before: '응대 업무로 인해 분산',    after: '목표 약 40% 확보' },
+                  ].map(({ cat, before, after }) => (
+                    <tr key={cat}>
+                      <td className="impact-cat">{cat}</td>
+                      <td className="impact-before">{before}</td>
+                      <td className="impact-after">{after}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </FadeUp>
         </div>
       </div>
     </Section>
@@ -338,17 +419,19 @@ function AdminDashboard() {
   return (
     <Section id="dashboard">
       <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label blue">Admin Dashboard</div>
-          <h2 className="section-title">실시간 관리자 대시보드</h2>
-          <p className="section-sub center">
-            로봇 상호작용·안전 이벤트·혼잡도를 한 화면에서 모니터링합니다.
-          </p>
-        </div></FadeUp>
+        <FadeUp>
+          <div className="section-header center">
+            <div className="label blue">Admin Dashboard</div>
+            <h2 className="section-title">실시간 관리자 대시보드</h2>
+            <p className="section-sub center">
+              로봇 상호작용·안전 이벤트·혼잡도를 한 화면에서 모니터링합니다.
+            </p>
+          </div>
+        </FadeUp>
 
         <FadeUp>
           <div className="db-shell glass">
-            {/* ── Header ── */}
+            {/* Header */}
             <div className="db-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="db-dot green" />
@@ -360,13 +443,13 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* ── KPIs ── */}
+            {/* KPIs */}
             <div className="db-kpis">
               {[
-                { n: '128',  u: '회',  l: '오늘 상호작용',    d: '↑ 전일 대비 +12%',  c: 'var(--blue)' },
-                { n: '42',   u: '%',  l: '직원 호출 감소율',  d: '↑ 목표 대비 +7%p',  c: 'var(--green)' },
-                { n: '74',   u: '건',  l: '자동 처리 질문',   d: '↑ 전일 대비 +5건',  c: 'var(--purple)' },
-                { n: '1.8',  u: '초',  l: '평균 응답 시간',   d: '✓ 목표치 이하',      c: 'var(--yellow)' },
+                { n: '128', u: '회', l: '오늘 상호작용',   d: '↑ 전일 대비 +12%', c: 'var(--blue)' },
+                { n: '42',  u: '%',  l: '직원 호출 감소율', d: '↑ 목표 대비 +7%p', c: 'var(--green)' },
+                { n: '74',  u: '건', l: '자동 처리 질문',  d: '↑ 전일 대비 +5건', c: 'var(--purple)' },
+                { n: '1.8', u: '초', l: '평균 응답 시간',  d: '✓ 목표치 이하',     c: 'var(--yellow)' },
               ].map(({ n, u, l, d, c }) => (
                 <div key={l} className="db-kpi">
                   <div className="db-kpi-label">{l}</div>
@@ -379,24 +462,27 @@ function AdminDashboard() {
               ))}
             </div>
 
-            {/* ── Row 1: chart + alert ── */}
+            {/* Row 1: chart + alert */}
             <div className="db-charts">
-              {/* Bar chart */}
               <div className="db-panel">
                 <div className="db-panel-title">시간대별 상호작용 수</div>
                 <div className="db-bars">
                   {hourlyData.map((v, i) => (
                     <div key={i} className="db-bar-col">
                       <div className="db-bar-bg">
-                        <div className="db-bar-fill" style={{ height: `${(v / maxV) * 100}%`, background: v === maxV ? 'var(--blue)' : 'rgba(37,99,235,0.28)' }} />
+                        <div
+                          className="db-bar-fill"
+                          style={{
+                            height: `${(v / maxV) * 100}%`,
+                            background: v === maxV ? 'var(--blue)' : 'rgba(37,99,235,0.28)',
+                          }}
+                        />
                       </div>
                       <div className="db-bar-x">{hourLabels[i]}</div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Alert log */}
               <div className="db-panel">
                 <div className="db-panel-title">🚨 안전·호출 알림</div>
                 <div className="db-log">
@@ -413,9 +499,8 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* ── Row 2: TOP5 + Peak + Robot status ── */}
+            {/* Row 2: TOP5 + Peak + Robot status */}
             <div className="db-charts db-charts-3">
-              {/* TOP5 questions */}
               <div className="db-panel">
                 <div className="db-panel-title">💬 자주 묻는 질문 TOP 5</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -434,7 +519,6 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Peak hours */}
               <div className="db-panel">
                 <div className="db-panel-title">⏰ 혼잡 시간대 분석</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -450,16 +534,15 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Robot status */}
               <div className="db-panel">
                 <div className="db-panel-title">🤖 로봇 현황</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[
-                    { label: '오늘 처리 안내',    value: '74건',    c: 'var(--blue)' },
-                    { label: '현재 상태',         value: '순찰 중', c: 'var(--green)' },
-                    { label: '배터리',            value: '82%',    c: 'var(--green)' },
-                    { label: '마지막 호출 응대',   value: '3분 전', c: 'var(--yellow)' },
-                    { label: '네트워크',          value: 'Wi-Fi 연결', c: 'var(--blue)' },
+                    { label: '오늘 처리 안내',  value: '74건',      c: 'var(--blue)' },
+                    { label: '현재 상태',        value: '순찰 중',  c: 'var(--green)' },
+                    { label: '배터리',           value: '82%',      c: 'var(--green)' },
+                    { label: '마지막 호출 응대', value: '3분 전',   c: 'var(--yellow)' },
+                    { label: '네트워크',         value: 'Wi-Fi 연결', c: 'var(--blue)' },
                   ].map(({ label, value, c }) => (
                     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
                       <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{label}</span>
@@ -470,7 +553,7 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* ── Status footer ── */}
+            {/* Status footer */}
             <div className="db-footer">
               {[
                 { dot: 'green',  text: '로봇: 활성' },
@@ -483,7 +566,7 @@ function AdminDashboard() {
                   <span>{text}</span>
                 </div>
               ))}
-              <span className="db-footer-note">* 시나리오 기반 예시 데이터</span>
+              <span className="db-footer-note">* 시나리오 기반 예시 데이터 — 실제 운영 결과와 다를 수 있습니다</span>
             </div>
           </div>
         </FadeUp>
@@ -492,117 +575,8 @@ function AdminDashboard() {
   )
 }
 
-/* ── IMPACT ──────────────────────────────────────────────── */
-function Impact() {
-  return (
-    <Section id="impact">
-      <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label" style={{ color: 'var(--green)' }}>Expected Impact</div>
-          <h2 className="section-title">도입 전 · 후 운영 변화</h2>
-          <p className="section-sub center">시나리오 기반 예상 효과입니다</p>
-        </div></FadeUp>
-
-        {/* KPI highlights */}
-        <FadeUp>
-          <div className="impact-kpis">
-            {[
-              { v: '42%',   l: '직원 호출 감소 (예상)',  c: 'var(--blue)' },
-              { v: '1.8초', l: '평균 AI 응답 시간',      c: 'var(--green)' },
-              { v: '74건',  l: '일 평균 자동 처리 질문', c: 'var(--purple)' },
-              { v: '40%↑',  l: '직원 안전 집중 가용 시간', c: 'var(--pink)' },
-            ].map(({ v, l, c }) => (
-              <GlassCard key={l} style={{ textAlign: 'center', padding: '28px 16px' }}>
-                <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.04em', color: c, marginBottom: 8 }}>{v}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-2)', wordBreak: 'keep-all' }}>{l}</div>
-              </GlassCard>
-            ))}
-          </div>
-        </FadeUp>
-
-        {/* Before / After cards */}
-        <div className="impact-grid">
-          {impactRows.map(({ icon, cat, before, after, color }) => (
-            <GlassCard key={cat} style={{ padding: 0, overflow: 'hidden' }}>
-              <div className="impact-card-top" style={{ borderBottom: `2px solid ${color}`, background: color + '12' }}>
-                <span style={{ fontSize: 18 }}>{icon}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{cat}</span>
-              </div>
-              <div className="impact-card-body">
-                <div className="impact-side">
-                  <span className="impact-tag before">Before</span>
-                  <span className="impact-side-text">{before}</span>
-                </div>
-                <div className="impact-arr">→</div>
-                <div className="impact-side">
-                  <span className="impact-tag after">After</span>
-                  <span className="impact-side-text after">{after}</span>
-                </div>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-
-        <FadeUp>
-          <p className="impact-note">* 위 수치는 서비스 시나리오 기반 예상치이며, 실제 운영 결과와 다를 수 있습니다.</p>
-        </FadeUp>
-      </div>
-    </Section>
-  )
-}
-
-/* ── FEATURES ────────────────────────────────────────────── */
-function Features() {
-  return (
-    <Section id="features">
-      <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label green">Core Features</div>
-          <h2 className="section-title">핵심 기능</h2>
-          <p className="section-sub center">방문객 경험부터 운영 분석까지, 하나의 시스템으로</p>
-        </div></FadeUp>
-        <div className="grid-4">
-          {features.map(({ icon: Icon, label, body, accent, dim }) => (
-            <GlassCard key={label} accentColor={accent}>
-              <div className="card-icon" style={{ background: dim }}><Icon size={20} color={accent} /></div>
-              <div className="card-title">{label}</div>
-              <div className="card-body">{body}</div>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )
-}
-
-/* ── MODULES ─────────────────────────────────────────────── */
-function Modules() {
-  return (
-    <Section id="modules">
-      <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label" style={{ color: 'var(--yellow)' }}>System Modules</div>
-          <h2 className="section-title">시스템 모듈</h2>
-        </div></FadeUp>
-        <div className="grid-3">
-          {modules.map(m => (
-            <GlassCard key={m.name}>
-              <div className="module-bar" style={{ background: m.bar }} />
-              <div className="module-name">{m.name}</div>
-              <div className="module-tech">{m.tech}</div>
-              <ul className="module-items">
-                {m.items.map(it => <li key={it}>{it}</li>)}
-              </ul>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )
-}
-
-/* ── SYSTEM FLOW ─────────────────────────────────────────── */
-function SystemFlow() {
+/* ── SYSTEM ARCHITECTURE (Modules + Flow 통합) ────────────── */
+function SystemArchitecture() {
   const Node = ({ icon, title, sub, color }) => (
     <div className="flow-node" style={{ borderColor: color, background: color + '14' }}>
       <div className="flow-node-icon">{icon}</div>
@@ -626,113 +600,89 @@ function SystemFlow() {
   )
 
   return (
-    <Section id="flow">
+    <Section id="architecture">
       <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label blue">System Flow</div>
-          <h2 className="section-title">서비스 데이터 흐름</h2>
-          <p className="section-sub center">방문객의 한 마디가 운영 데이터가 되는 과정</p>
-        </div></FadeUp>
+        <FadeUp>
+          <div className="section-header center">
+            <div className="label" style={{ color: 'var(--yellow)' }}>System Architecture</div>
+            <h2 className="section-title">시스템 구조</h2>
+            <p className="section-sub center">방문객의 한 마디가 운영 데이터가 되는 기술 흐름</p>
+          </div>
+        </FadeUp>
 
+        {/* Module chips */}
+        <FadeUp>
+          <div className="module-chips">
+            {modules.map(m => (
+              <div key={m.name} className="module-chip glass">
+                <div className="module-chip-dot" style={{ background: m.color }} />
+                <div>
+                  <div className="module-chip-name">{m.name}</div>
+                  <div className="module-chip-tech">{m.tech}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+
+        {/* Data flow diagram */}
         <FadeUp>
           <div className="flow-diagram">
-
-            {/* ── Stage 1: 입력 ── */}
             <div className="flow-stage">
               <div className="flow-stage-label">입력 · 인터랙션</div>
               <div className="flow-stage-nodes">
-                <Node icon="👧" title="방문객"    sub="음성 · 터치"    color="#fbbf24" />
+                <Node icon="👧" title="방문객"    sub="음성 · 터치"   color="#fbbf24" />
                 <HArr />
-                <Node icon="🤖" title="Temi 로봇" sub="Android SDK"   color="#4f8ef7" />
+                <Node icon="🤖" title="Temi 로봇" sub="Android SDK"  color="#4f8ef7" />
                 <div className="flow-h-plus">+</div>
-                <Node icon="⚡" title="센서 모듈"  sub="버튼 · 감지"  color="#f97316" />
+                <Node icon="⚡" title="센서 모듈"  sub="버튼 · 감지" color="#f97316" />
               </div>
             </div>
 
             <VConn label="REST API / WebSocket" />
 
-            {/* ── Stage 2: 처리 ── */}
             <div className="flow-stage">
               <div className="flow-stage-label">처리 · 분석</div>
               <div className="flow-stage-nodes">
-                <Node icon="🧠" title="AI / LLM"         sub="의도 분류 · 답변 생성"  color="#a78bfa" />
+                <Node icon="🧠" title="AI / LLM"        sub="의도 분류 · 답변 생성" color="#a78bfa" />
                 <HBiArr />
-                <Node icon="🔌" title="Spring Boot API"  sub="이벤트 처리 · 라우팅"   color="#34d399" />
+                <Node icon="🔌" title="Spring Boot API" sub="이벤트 처리 · 라우팅"  color="#34d399" />
               </div>
             </div>
 
             <VConn label="DB 저장 · 실시간 전송" />
 
-            {/* ── Stage 3: 출력 ── */}
             <div className="flow-stage">
               <div className="flow-stage-label">저장 · 출력</div>
               <div className="flow-stage-nodes">
-                <Node icon="🗄️" title="MySQL DB"          sub="이벤트 · 통계 저장" color="#fb923c" />
+                <Node icon="🗄️" title="MySQL DB"       sub="이벤트 · 통계 저장" color="#fb923c" />
                 <HArr />
-                <Node icon="📊" title="React 대시보드"     sub="실시간 모니터링"    color="#2dd4bf" />
+                <Node icon="📊" title="React 대시보드"  sub="실시간 모니터링"    color="#2dd4bf" />
                 <HArr />
-                <Node icon="👨‍💼" title="운영 담당자"        sub="알림 · 현장 대응"  color="#e879a0" />
+                <Node icon="👨‍💼" title="운영 담당자"    sub="알림 · 현장 대응"  color="#e879a0" />
               </div>
             </div>
-
           </div>
         </FadeUp>
-      </div>
-    </Section>
-  )
-}
 
-/* ── SCENARIO ────────────────────────────────────────────── */
-function Scenario() {
-  return (
-    <Section id="scenario">
-      <div className="container">
-        <FadeUp><div className="section-header center">
-          <div className="label green">User Scenario</div>
-          <h2 className="section-title">실제 사용 시나리오</h2>
-          <p className="section-sub center">키즈카페 현장에서 Kids-Friends Robot이 작동하는 한 장면</p>
-        </div></FadeUp>
-        <div className="steps">
-          {steps.map(({ text, color }, i) => (
-            <FadeUp key={i} delay={i * 0.06}>
-              <div className="step">
-                <div className="step-num" style={{ background: color }}>{i + 1}</div>
-                <div className="step-content">
-                  <div className="step-text">{text}</div>
-                </div>
-              </div>
-            </FadeUp>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )
-}
-
-/* ── DEMO ────────────────────────────────────────────────── */
-function Demo() {
-  return (
-    <Section id="demo">
-      <div className="container-wide">
-        <FadeUp><div className="section-header center">
-          <div className="label blue">Demo</div>
-          <h2 className="section-title">시연 영상</h2>
-        </div></FadeUp>
+        {/* Link to full arch page */}
         <FadeUp>
-          <div className="glass demo-main">
-            <div className="demo-play-btn">▶</div>
-            <p style={{ fontSize: 20, fontWeight: 600, color: 'var(--text)' }}>🎬 Demo Coming Soon</p>
-            <p style={{ fontSize: 14, color: 'var(--text-2)' }}>시연 영상이 곧 업로드됩니다</p>
+          <div className="arch-deep-link glass">
+            <div>
+              <div className="arch-deep-link-title">전체 아키텍처 상세 문서</div>
+              <div className="arch-deep-link-body">
+                Edge Computing 구조, 통신 프로토콜 결정, MVP 추천 설계까지 포함한 기술 문서입니다.
+              </div>
+            </div>
+            <a
+              href="/arch.html"
+              className="btn btn-ghost"
+              style={{ color: 'var(--green)', borderColor: 'rgba(5,150,105,0.3)', flexShrink: 0 }}
+            >
+              아키텍처 문서 보기 ↗
+            </a>
           </div>
         </FadeUp>
-        <div className="demo-grid">
-          {demoItems.map(({ emoji, label }) => (
-            <GlassCard key={label} className="demo-card" style={{ padding: 0 }}>
-              <div className="demo-thumb">{emoji}</div>
-              <div className="demo-label">{label}</div>
-            </GlassCard>
-          ))}
-        </div>
       </div>
     </Section>
   )
@@ -743,16 +693,33 @@ function Team() {
   return (
     <Section id="team">
       <div className="container">
-        <FadeUp><div className="section-header center">
-          <div className="label" style={{ color: 'var(--purple)' }}>Team</div>
-          <h2 className="section-title">팀 소개</h2>
-        </div></FadeUp>
-        <div className="team-grid">
-          {team.map(({ emoji, role, desc }) => (
-            <GlassCard key={role} className="team-card" style={{ padding: '28px 16px', width: 156 }}>
-              <div className="team-emoji">{emoji}</div>
-              <div className="team-role">{role}</div>
-              <div className="team-desc">{desc}</div>
+        <FadeUp>
+          <div className="section-header center">
+            <div className="label" style={{ color: 'var(--purple)' }}>Team</div>
+            <h2 className="section-title">팀 소개</h2>
+            <p className="section-sub center">Kids-Friends Robot을 함께 만든 5인 팀</p>
+          </div>
+        </FadeUp>
+        <div className="team-grid-new">
+          {team.map(({ emoji, name, role, desc, tech, github }) => (
+            <GlassCard key={role} style={{ padding: '28px 24px' }}>
+              <div className="team-card-top">
+                <div className="team-emoji-lg">{emoji}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="team-member-name">{name}</div>
+                  <div className="team-role-pill">{role}</div>
+                </div>
+              </div>
+              <div className="team-member-desc">{desc}</div>
+              <div className="team-member-tech">{tech}</div>
+              <a
+                href={github}
+                className="team-github-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub →
+              </a>
             </GlassCard>
           ))}
         </div>
@@ -784,8 +751,8 @@ function FinalCTA() {
         <FadeUp delay={0.1}>
           <div className="final-cta-btns">
             <a href="#dashboard" className="btn btn-primary" style={{ padding: '14px 28px', fontSize: 15 }}>어드민 대시보드 보기</a>
-            <a href="#scenario"  className="btn btn-ghost"   style={{ padding: '14px 28px', fontSize: 15 }}>서비스 시나리오 보기</a>
-            <a href="#"          className="btn btn-ghost"   style={{ padding: '14px 28px', fontSize: 15 }}>GitHub ↗</a>
+            <a href="#solution"  className="btn btn-ghost"   style={{ padding: '14px 28px', fontSize: 15 }}>서비스 흐름 보기</a>
+            <a href="/arch.html" className="btn btn-ghost"   style={{ padding: '14px 28px', fontSize: 15 }}>아키텍처 문서 ↗</a>
           </div>
         </FadeUp>
       </motion.div>
@@ -799,35 +766,33 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-top">
-          <div className="footer-col">
-            <h4>서비스</h4>
-            <a href="#problem">문제 정의</a>
-            <a href="#solution">솔루션</a>
-            <a href="#features">핵심 기능</a>
+          <div className="footer-brand-col">
+            <div className="footer-brand-logo">
+              <img src="/media/logo.png" alt="" style={{ height: 28, width: 'auto' }} onError={e => e.target.style.display = 'none'} />
+              <span className="footer-brand-name">Kids-Friends Robot</span>
+            </div>
+            <p className="footer-brand-desc">
+              Temi 로봇 기반 키즈카페 운영 보조 시스템.<br />
+              반복 응대는 로봇이, 안전은 직원이.
+            </p>
           </div>
           <div className="footer-col">
-            <h4>운영</h4>
-            <a href="#dashboard">어드민 대시보드</a>
-            <a href="#impact">도입 효과</a>
-            <a href="#scenario">사용 시나리오</a>
+            <h4>페이지</h4>
+            <a href="#problem">Problem</a>
+            <a href="#solution">Solution</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#team">Team</a>
           </div>
           <div className="footer-col">
-            <h4>시스템</h4>
-            <a href="#modules">모듈 구조</a>
-            <a href="#flow">서비스 플로우</a>
+            <h4>외부 링크</h4>
             <a href="/arch.html">시스템 아키텍처 ↗</a>
-          </div>
-          <div className="footer-col">
-            <h4>리소스</h4>
-            <a href="#">GitHub ↗</a>
-            <a href="#">API Docs ↗</a>
-            <a href="#">발표자료 ↗</a>
           </div>
         </div>
         <div className="footer-divider" />
         <div className="footer-bottom">
           <span className="footer-copy">© 2025 Kids-Friends Robot Team. All rights reserved.</span>
-          <span className="footer-copy">Temi 로봇을 활용한 키즈카페 운영 보조 시스템</span>
+          <span className="footer-copy">v0.1 · 시나리오 기반 프로토타입</span>
         </div>
       </div>
     </footer>
@@ -843,20 +808,13 @@ export default function App() {
         <div className="mesh-blob blob-2" />
         <div className="mesh-blob blob-3" />
       </div>
-
       <NavBar />
       <main className="page">
         <Hero />
         <Problem />
-        <Idea />
-        <Solution />
+        <HowItWorks />
         <AdminDashboard />
-        <Impact />
-        <Features />
-        <Modules />
-        <SystemFlow />
-        <Scenario />
-        <Demo />
+        <SystemArchitecture />
         <Team />
         <FinalCTA />
       </main>
