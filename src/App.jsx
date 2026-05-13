@@ -77,13 +77,12 @@ const modules = [
   { color: '#2dd4bf',       name: 'Admin Web',    tech: 'React · Next.js' },
 ]
 
-/* ── 팀원 정보: name, github 필드를 실제 값으로 교체하세요 ─── */
 const team = [
-  { emoji: '🧭', name: '팀원 이름', role: 'SW Lead',            desc: '총괄 기획·설계',  tech: 'System Design · Project Management', github: '#' },
-  { emoji: '🗄️', name: '팀원 이름', role: 'Backend Developer',  desc: 'API·DB·이벤트 흐름', tech: 'Spring Boot · MySQL · REST API',  github: '#' },
-  { emoji: '⚡', name: '팀원 이름', role: 'Sensor Engineer',    desc: 'Arduino·ESP32 제어', tech: 'Arduino · ESP32 · Raspberry Pi',  github: '#' },
-  { emoji: '🤖', name: '팀원 이름', role: 'Temi Developer',     desc: 'SDK·Android 제어',   tech: 'Android Java · Temi SDK',          github: '#' },
-  { emoji: '🖥️', name: '팀원 이름', role: 'Frontend Developer', desc: 'Admin Web·UI',        tech: 'React · Next.js · CSS',            github: '#' },
+  { emoji: '🧭', name: '박도현', role: '팀장 및 총괄 · Full-Stack', desc: '프로젝트 총괄·기획·설계', tech: 'React · Node.js · System Design', github: '#' },
+  { emoji: '🗄️', name: '변영빈', role: 'Backend Developer',          desc: 'API·DB·서버 개발',          tech: 'Spring Boot · MySQL · REST API',  github: '#' },
+  { emoji: '🤖', name: '유준상', role: 'AI Developer',                desc: 'AI 모델·추론·파이프라인',   tech: 'Python · PyTorch · OpenCV',       github: '#' },
+  { emoji: '🎨', name: '정모라', role: 'UI/UX Designer',              desc: 'UI 설계·사용자 경험 디자인', tech: 'Figma · Prototyping · Design System', github: '#' },
+  { emoji: '⚡', name: '박나경', role: 'Sensor Engineer',             desc: 'Arduino·ESP32 센서 제어',   tech: 'Arduino · ESP32 · Raspberry Pi',  github: '#' },
 ]
 
 /* ── Dashboard mock data ──────────────────────────────────── */
