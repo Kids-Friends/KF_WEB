@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, Bell, ShieldAlert, MapPin, Bot, BellRing, BarChart2 } from 'lucide-react'
 import HeroParticleBackground from './HeroParticleBackground'
+import { useCallContext } from './context/CallContext.jsx'
+import { createCall } from './services/api.js'
 
 /* ── DATA ─────────────────────────────────────────────────── */
 const problems = [
@@ -832,6 +834,139 @@ function Footer() {
   )
 }
 
+/* ── STAFF CALL ──────────────────────────────────────────── */
+const ZONES = [
+  { id: 'BALL_POOL',   label: '볼풀 구역' },
+  { id: 'SLIDE_ZONE',  label: '미끄럼틀 구역' },
+  { id: 'MAIN_ZONE',   label: '메인 구역' },
+  { id: 'FOOD_ZONE',   label: '식사 구역' },
+  { id: 'REST_ZONE',   label: '휴식 구역' },
+]
+
+function StaffCallModal({ open, onClose }) {
+  const [zone, setZone] = useState('BALL_POOL')
+  const [reason, setReason] = useState('')
+  const [status, setStatus] = useState('idle') // idle | loading | success
+  const { addCall } = useCallContext()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setStatus('loading')
+    const payload = {
+      robotId: 'TEMI_01',
+      zoneId: zone,
+      role: 'CHILD',
+      sessionId: `sess-${Math.random().toString(36).slice(2, 9)}`,
+      reason: reason.trim() || '도움이 필요해요',
+    }
+    try {
+      const result = await createCall(payload)
+      addCall({ ...payload, ...result })
+    } catch {
+      addCall({ ...payload, callId: Date.now(), status: 'WAITING' })
+    }
+    setStatus('success')
+    setTimeout(() => {
+      setStatus('idle')
+      setReason('')
+      onClose()
+    }, 1800)
+  }
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="staff-call-overlay"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="staff-call-modal glass"
+            onClick={e => e.stopPropagation()}
+            initial={{ opacity: 0, y: 32, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.97 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {status === 'success' ? (
+              <div className="staff-call-success">
+                <div style={{ fontSize: 52, marginBottom: 14 }}>✅</div>
+                <div className="staff-call-success-title">직원 호출 완료!</div>
+                <div className="staff-call-success-sub">잠시만 기다려 주세요</div>
+              </div>
+            ) : (
+              <>
+                <div className="staff-call-modal-header">
+                  <span style={{ fontSize: 28 }}>🔔</span>
+                  <div>
+                    <div className="staff-call-modal-title">직원 호출</div>
+                    <div className="staff-call-modal-sub">직원이 곧 도움을 드리러 갑니다</div>
+                  </div>
+                  <button onClick={onClose} className="staff-call-close" aria-label="닫기">✕</button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="staff-call-form">
+                  <div className="admin-input-group">
+                    <label className="admin-input-label">현재 위치 구역</label>
+                    <select
+                      className="admin-input"
+                      value={zone}
+                      onChange={e => setZone(e.target.value)}
+                    >
+                      {ZONES.map(z => (
+                        <option key={z.id} value={z.id}>{z.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="admin-input-group">
+                    <label className="admin-input-label">요청 내용 (선택)</label>
+                    <input
+                      className="admin-input"
+                      type="text"
+                      value={reason}
+                      onChange={e => setReason(e.target.value)}
+                      placeholder="예: 아이가 넘어졌어요, 도움이 필요해요..."
+                      maxLength={80}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary staff-call-submit"
+                    disabled={status === 'loading'}
+                  >
+                    {status === 'loading' ? '호출 중...' : '🔔 직원 호출하기'}
+                  </button>
+                </form>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function StaffCallButton() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button
+        className="staff-call-fab"
+        onClick={() => setOpen(true)}
+        aria-label="직원 호출"
+      >
+        <span style={{ fontSize: 20 }}>🔔</span>
+        <span>직원 호출</span>
+      </button>
+      <StaffCallModal open={open} onClose={() => setOpen(false)} />
+    </>
+  )
+}
+
 /* ── APP ─────────────────────────────────────────────────── */
 export default function App() {
   return (
@@ -852,6 +987,7 @@ export default function App() {
         <FinalCTA />
       </main>
       <Footer />
+      <StaffCallButton />
     </>
   )
 }
