@@ -1,6 +1,7 @@
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 
 const NAV_ITEMS = [
+  { to: '/admin/dashboard', label: '통합 대시보드' },
   { to: '/admin/members', label: '회원 관리' },
   { to: '/admin/robots', label: '로봇 관리' },
   { to: '/admin/calls', label: '호출 로그' },
@@ -19,8 +20,8 @@ function getActiveUrl() {
 export default function AdminLayout() {
   const location = useLocation()
 
-  if (location.pathname === '/admin' || location.pathname === '/admin/dashboard') {
-    return <Navigate to="/admin/members" replace />
+  if (location.pathname === '/admin') {
+    return <Navigate to="/admin/dashboard" replace />
   }
 
   return (
