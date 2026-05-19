@@ -18,7 +18,10 @@ let axiosInstance = createInstance()
 function createInstance() {
   const instance = axios.create({
     baseURL: resolveBaseUrl(),
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+    },
   })
 
   // Response interceptor — unwrap { message, data } envelope

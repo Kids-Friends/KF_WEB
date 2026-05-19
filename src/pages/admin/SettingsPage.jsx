@@ -44,10 +44,15 @@ export default function SettingsPage() {
 
   const handleSave = (e) => {
     e.preventDefault()
-    
-    const targetIp = ip.trim() || 'localhost'
-    const targetPort = port.trim() || '8080'
-    const nextUrl = `${protocol}://${targetIp}:${targetPort}`
+
+    const rawIp = ip.trim() || 'localhost'
+    let nextUrl
+    if (rawIp.startsWith('http://') || rawIp.startsWith('https://')) {
+      nextUrl = rawIp.replace(/\/+$/, '')
+    } else {
+      const targetPort = port.trim() || '8080'
+      nextUrl = `${protocol}://${rawIp}:${targetPort}`
+    }
 
     localStorage.setItem(STORAGE_KEY, nextUrl)
     rebuildInstance()
@@ -106,7 +111,7 @@ export default function SettingsPage() {
                   type="text"
                   value={ip}
                   onChange={(e) => setIp(e.target.value)}
-                  placeholder="예: 192.168.1.100"
+                  placeholder="예: 192.168.1.100  또는  https://abc123.ngrok-free.app"
                   autoComplete="off"
                   spellCheck={false}
                   style={{ marginBottom: 0, height: '42px' }}
@@ -150,8 +155,8 @@ export default function SettingsPage() {
               도움말
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, margin: 0 }}>
-              로봇과 서버가 같은 와이파이에 연결되어 있어야 합니다.<br/>
-              서버 컴퓨터의 IP 주소를 확인한 뒤 위 칸에 입력해주세요.
+              [로컬] 로봇과 서버가 같은 와이파이에 연결된 경우: IP 주소 입력 (예: 192.168.1.100)<br/>
+              [ngrok] 외부 접속이 필요한 경우: ngrok URL 전체를 IP 칸에 붙여넣으세요 (예: https://abc123.ngrok-free.app)
             </p>
           </div>
         </div>
